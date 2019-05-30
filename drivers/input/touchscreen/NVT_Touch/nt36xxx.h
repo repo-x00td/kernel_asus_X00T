@@ -22,12 +22,11 @@
 #include <linux/device.h>
 #include <linux/i2c.h>
 #include <linux/input.h>
-/* Huaqin add by yuexinghan for ITO test start */
 #include <linux/regulator/consumer.h>
 #include <linux/debugfs.h>
-/* Huaqin add by yuexinghan for ITO test end */
 
 #define NVT_DEBUG 1
+#define NVT_ITO_TEST 0
 
 /* ---GPIO number--- */
 #define NVTTOUCH_INT_PIN 943
@@ -66,8 +65,10 @@
 #define NVT_TS_NAME "NVTCapacitiveTouchScreen"
 #define HWINFO_NAME "tp_wake_switch"
 
+#if NVT_ITO_TEST
 /* ---add ito test --- */
 extern int32_t ito_selftest_open(void);
+#endif
 
 /* ---Touch info.--- */
 #define TOUCH_MAX_FINGER_NUM 10
