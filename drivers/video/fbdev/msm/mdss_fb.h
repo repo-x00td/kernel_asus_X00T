@@ -286,6 +286,8 @@ struct msm_fb_data_type {
 	u32 idle_state;
 	struct msm_fb_fps_info fps_info;
 	struct delayed_work idle_notify_work;
+	struct delayed_work early_unblank_work;
+	bool early_unblank_work_queued;
 
 	bool atomic_commit_pending;
 
@@ -484,4 +486,6 @@ void mdss_panelinfo_to_fb_var(struct mdss_panel_info *pinfo,
 						struct fb_var_screeninfo *var);
 void mdss_fb_calc_fps(struct msm_fb_data_type *mfd);
 void mdss_fb_idle_pc(struct msm_fb_data_type *mfd);
+extern bool lcd_suspend_flag;
+extern int g_resume_from_fp;
 #endif /* MDSS_FB_H */
