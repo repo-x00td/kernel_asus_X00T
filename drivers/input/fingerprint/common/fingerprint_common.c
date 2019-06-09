@@ -112,8 +112,7 @@ int commonfp_hw_reset(int ms)
 	gpio_set_value(fp_g.rst_gpio, 1);
 	mdelay(ms);
 #endif
-
-	pr_info("hw reset success,ret:%d\n", ret);
+	pr_debug("%s: hw reset success,ret:%d\n", __func__, ret);
 	return ret;
 exit:
 	pr_err("fingerprint_hw_reset failed,ret:%d\n", ret);
@@ -145,12 +144,12 @@ int commonfp_request_irq(irq_handler_t handler, irq_handler_t thread_fn,
 void commonfp_free_irq(void *dev_id)
 {
 	if (irq_flag == 0) {
-		pr_info("%s: irq has been free\n", __func__);
+		pr_debug("%s: irq has been free\n", __func__);
 		return;
 	}
 	free_irq(fp_g.irq_num, dev_id);
 	irq_flag = 0;
-	pr_info("%s: success\n", __func__);
+	pr_debug("%s: success\n", __func__);
 }
 
 void commonfp_irq_enable(void)
