@@ -68,28 +68,28 @@ static int nvt_lcm_bias_power_init(struct nvt_ts_data *data)
 	data->lcm_lab = regulator_get(&data->client->dev, "lcm_lab");
 	if (IS_ERR(data->lcm_lab)) {
 		ret = PTR_ERR(data->lcm_lab);
-		NVT_ERR("Regulator get failed lcm_lab ret=%d", ret);
+		pr_err("Regulator get failed lcm_lab ret=%d", ret);
 		goto _end;
 	}
 	if (regulator_count_voltages(data->lcm_lab) > 0) {
 		ret = regulator_set_voltage(data->lcm_lab, LCM_LAB_MIN_UV,
 					    LCM_LAB_MAX_UV);
 		if (ret) {
-			NVT_ERR("Regulator set_vtg failed lcm_lab ret=%d", ret);
+			pr_err("Regulator set_vtg failed lcm_lab ret=%d", ret);
 			goto reg_lcm_lab_put;
 		}
 	}
 	data->lcm_ibb = regulator_get(&data->client->dev, "lcm_ibb");
 	if (IS_ERR(data->lcm_ibb)) {
 		ret = PTR_ERR(data->lcm_ibb);
-		NVT_ERR("Regulator get failed lcm_ibb ret=%d", ret);
+		pr_err("Regulator get failed lcm_ibb ret=%d", ret);
 		goto reg_set_lcm_lab_vtg;
 	}
 	if (regulator_count_voltages(data->lcm_ibb) > 0) {
 		ret = regulator_set_voltage(data->lcm_ibb, LCM_IBB_MIN_UV,
 					    LCM_IBB_MAX_UV);
 		if (ret) {
-			NVT_ERR("Regulator set_vtg failed lcm_lab ret=%d", ret);
+			pr_err("Regulator set_vtg failed lcm_lab ret=%d", ret);
 			goto reg_lcm_ibb_put;
 		}
 	}
@@ -134,7 +134,7 @@ static int nvt_lcm_power_source_ctrl(struct nvt_ts_data *data, int enable)
 				rc = regulator_enable(data->lcm_lab);
 				if (rc) {
 					atomic_dec(&(data->lcm_lab_power));
-					NVT_ERR("Regulator lcm_lab enable failed rc=%d",
+					pr_err("Regulator lcm_lab enable failed rc=%d",
 						rc);
 				}
 			} else {
@@ -144,7 +144,7 @@ static int nvt_lcm_power_source_ctrl(struct nvt_ts_data *data, int enable)
 				rc = regulator_enable(data->lcm_ibb);
 				if (rc) {
 					atomic_dec(&(data->lcm_ibb_power));
-					NVT_ERR("Regulator lcm_ibb enable failed rc=%d",
+					pr_err("Regulator lcm_ibb enable failed rc=%d",
 						rc);
 				}
 			} else {
@@ -155,7 +155,7 @@ static int nvt_lcm_power_source_ctrl(struct nvt_ts_data *data, int enable)
 				rc = regulator_disable(data->lcm_lab);
 				if (rc) {
 					atomic_inc(&(data->lcm_lab_power));
-					NVT_ERR("Regulator lcm_lab disable failed rc=%d",
+					pr_err("Regulator lcm_lab disable failed rc=%d",
 						rc);
 				}
 			} else {
@@ -165,7 +165,7 @@ static int nvt_lcm_power_source_ctrl(struct nvt_ts_data *data, int enable)
 				rc = regulator_disable(data->lcm_ibb);
 				if (rc) {
 					atomic_inc(&(data->lcm_ibb_power));
-					NVT_ERR("Regulator lcm_ibb disable failed rc=%d",
+					pr_err("Regulator lcm_ibb disable failed rc=%d",
 						rc);
 				}
 			} else {
@@ -173,7 +173,7 @@ static int nvt_lcm_power_source_ctrl(struct nvt_ts_data *data, int enable)
 			}
 		}
 	} else
-		NVT_ERR("Regulator lcm_ibb or lcm_lab is invalid");
+		pr_err("Regulator lcm_ibb or lcm_lab is invalid");
 	return 0;
 }
 
@@ -440,9 +440,9 @@ static ssize_t nvt_gesture_mode_set_proc(struct file *filp,
 		else
 			gesture_mode = 0x1FF;
 	} else {
-		NVT_ERR("set gesture mode failed\n");
+		pr_err("set gesture mode failed\n");
 	}
-	NVT_LOG("gesture_mode = 0x%x\n", (unsigned int)gesture_mode);
+	pr_info("gesture_mode = 0x%x\n", (unsigned int)gesture_mode);
 
 	return count;
 }
@@ -487,7 +487,7 @@ int32_t CTP_I2C_READ(struct i2c_client *client, uint16_t address, uint8_t *buf,
 	}
 
 	if (unlikely(retries == 5)) {
-		NVT_ERR("error, ret=%d\n", ret);
+		pr_err("error, ret=%d\n", ret);
 		ret = -EIO;
 	}
 
@@ -508,7 +508,7 @@ int32_t CTP_I2C_READ_DUMMY(struct i2c_client *client, uint16_t address)
 
 	ret = CTP_I2C_READ(client, address, buf, 2);
 	if (ret < 0)
-		NVT_ERR("%s failed.(%d)\n", __func__, ret);
+		pr_err("%s failed.(%d)\n", __func__, ret);
 
 	return ret;
 }
@@ -540,7 +540,7 @@ int32_t CTP_I2C_WRITE(struct i2c_client *client, uint16_t address, uint8_t *buf,
 	}
 
 	if (unlikely(retries == 5)) {
-		NVT_ERR("error, ret=%d\n", ret);
+		pr_err("error, ret=%d\n", ret);
 		ret = -EIO;
 	}
 
@@ -624,7 +624,7 @@ int32_t nvt_clear_fw_status(void)
 	}
 
 	if (i >= retry) {
-		NVT_ERR("failed, i=%d, buf[1]=0x%02X\n", i, buf[1]);
+		pr_err("failed, i=%d, buf[1]=0x%02X\n", i, buf[1]);
 		return -1;
 	} else {
 		return 0;
@@ -663,7 +663,7 @@ int32_t nvt_check_fw_status(void)
 	}
 
 	if (i >= retry) {
-		NVT_ERR("failed, i=%d, buf[1]=0x%02X\n", i, buf[1]);
+		pr_err("failed, i=%d, buf[1]=0x%02X\n", i, buf[1]);
 		return -1;
 	} else {
 		return 0;
@@ -699,7 +699,7 @@ int32_t nvt_check_fw_reset_state(RST_COMPLETE_STATE check_reset_state)
 
 		retry++;
 		if (unlikely(retry > 100)) {
-			NVT_ERR("error, retry=%d, buf[1]=0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X\n",
+			pr_err("error, retry=%d, buf[1]=0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X\n",
 				retry, buf[1], buf[2], buf[3], buf[4], buf[5]);
 			ret = -1;
 			break;
@@ -736,7 +736,7 @@ int32_t nvt_read_pid(void)
 
 	ts->nvt_pid = (buf[2] << 8) + buf[1];
 
-	NVT_LOG("PID=%04X\n", ts->nvt_pid);
+	pr_info("PID=%04X\n", ts->nvt_pid);
 
 	return ret;
 }
@@ -774,7 +774,7 @@ info_retry:
 
 	/* ---clear x_num, y_num if fw info is broken--- */
 	if ((buf[1] + buf[2]) != 0xFF) {
-		NVT_ERR("FW info is broken! fw_ver=0x%02X, ~fw_ver=0x%02X\n",
+		pr_err("FW info is broken! fw_ver=0x%02X, ~fw_ver=0x%02X\n",
 			buf[1], buf[2]);
 		ts->fw_ver = 0;
 		ts->x_num = 18;
@@ -785,10 +785,10 @@ info_retry:
 
 		if (retry_count < 3) {
 			retry_count++;
-			NVT_ERR("retry_count=%d\n", retry_count);
+			pr_err("retry_count=%d\n", retry_count);
 			goto info_retry;
 		} else {
-			NVT_ERR("Set default fw_ver=0, x_num=18, y_num=32, abs_x_max=1080, abs_y_max=1920, max_button_num=0!\n");
+			pr_err("Set default fw_ver=0, x_num=18, y_num=32, abs_x_max=1080, abs_y_max=1920, max_button_num=0!\n");
 			ret = -1;
 		}
 	} else {
@@ -824,12 +824,12 @@ static ssize_t nvt_flash_read(struct file *file, char __user *buff,
 	int8_t i2c_wr = 0;
 
 	if (count > sizeof(str)) {
-		NVT_ERR("error count=%zu\n", count);
+		pr_err("error count=%zu\n", count);
 		return -EFAULT;
 	}
 
 	if (copy_from_user(str, buff, count)) {
-		NVT_ERR("copy from user error\n");
+		pr_err("copy from user error\n");
 		return -EFAULT;
 	}
 
@@ -847,13 +847,13 @@ static ssize_t nvt_flash_read(struct file *file, char __user *buff,
 			if (ret == 1)
 				break;
 
-			NVT_ERR("error, retries=%d, ret=%d\n", retries, ret);
+			pr_err("error, retries=%d, ret=%d\n", retries, ret);
 
 			retries++;
 		}
 
 		if (unlikely(retries == 20)) {
-			NVT_ERR("error, ret = %d\n", ret);
+			pr_err("error, ret = %d\n", ret);
 			return -EIO;
 		}
 
@@ -865,7 +865,7 @@ static ssize_t nvt_flash_read(struct file *file, char __user *buff,
 			if (ret == 2)
 				break;
 
-			NVT_ERR("error, retries=%d, ret=%d\n", retries, ret);
+			pr_err("error, retries=%d, ret=%d\n", retries, ret);
 
 			retries++;
 		}
@@ -877,14 +877,14 @@ static ssize_t nvt_flash_read(struct file *file, char __user *buff,
 		}
 
 		if (unlikely(retries == 20)) {
-			NVT_ERR("error, ret = %d\n", ret);
+			pr_err("error, ret = %d\n", ret);
 			return -EIO;
 		}
 
 		return ret;
 	}
 
-	NVT_ERR("Call error, str[0]=%d\n", str[0]);
+	pr_err("Call error, str[0]=%d\n", str[0]);
 	return -EFAULT;
 }
 
@@ -901,7 +901,7 @@ static int32_t nvt_flash_open(struct inode *inode, struct file *file)
 
 	dev = kmalloc(sizeof(struct nvt_flash_data), GFP_KERNEL);
 	if (dev == NULL) {
-		NVT_ERR("Failed to allocate memory for nvt flash data\n");
+		pr_err("Failed to allocate memory for nvt flash data\n");
 		return -ENOMEM;
 	}
 
@@ -946,16 +946,15 @@ static int32_t nvt_flash_proc_init(void)
 {
 	NVT_proc_entry = proc_create(DEVICE_NAME, 0444, NULL, &nvt_flash_fops);
 	if (NVT_proc_entry == NULL) {
-		NVT_ERR("Failed!\n");
+		pr_err("Failed!\n");
 		return -ENOMEM;
 	}
 
-	NVT_LOG("Succeeded!\n");
+	pr_info("Succeeded!\n");
 
-
-	NVT_LOG("============================================================\n");
-	NVT_LOG("Create /proc/NVTflash\n");
-	NVT_LOG("============================================================\n");
+	pr_info("===========================================\n");
+	pr_info("Create /proc/NVTflash\n");
+	pr_info("===========================================\n");
 
 	return 0;
 }
@@ -1053,75 +1052,75 @@ void nvt_ts_wakeup_gesture_report(uint8_t gesture_id)
 {
 	uint32_t keycode = 0;
 
-	NVT_LOG("gesture_id = %d\n", gesture_id);
+	pr_info("gesture_id = %d\n", gesture_id);
 
 	switch (gesture_id) {
 	case ID_GESTURE_WORD_C:
 		if (gesture_mode & MASK_GESTURE_C) {
-			NVT_LOG("Gesture : Word-C.\n");
+			pr_info("Gesture : Word-C.\n");
 			keycode = gesture_key_array[0];
 		}
 		break;
 	case ID_GESTURE_WORD_W:
 		if (gesture_mode & MASK_GESTURE_W) {
-			NVT_LOG("Gesture : Word-W.\n");
+			pr_info("Gesture : Word-W.\n");
 			keycode = gesture_key_array[1];
 		}
 		break;
 	case ID_GESTURE_WORD_V:
 		if (gesture_mode & MASK_GESTURE_V) {
-			NVT_LOG("Gesture : Word-V.\n");
+			pr_info("Gesture : Word-V.\n");
 			keycode = gesture_key_array[2];
 		}
 		break;
 	case ID_GESTURE_DOUBLE_CLICK:
 		if (gesture_mode & MASK_GESTURE_DOUBLE_CLICK) {
-			NVT_LOG("Gesture : Double Click.\n");
+			pr_info("Gesture : Double Click.\n");
 			keycode = gesture_key_array[3];
 		}
 		break;
 	case ID_GESTURE_WORD_Z:
 		if (gesture_mode & MASK_GESTURE_Z) {
-			NVT_LOG("Gesture : Word-Z.\n");
+			pr_info("Gesture : Word-Z.\n");
 			keycode = gesture_key_array[4];
 		}
 		break;
 	/* case GESTURE_WORD_M:
-			NVT_LOG("Gesture : Word-M.\n");
+			pr_info("Gesture : Word-M.\n");
 			keycode = gesture_key_array[5];
 			break;
 		case GESTURE_WORD_O:
-			NVT_LOG("Gesture : Word-O.\n");
+			pr_info("Gesture : Word-O.\n");
 			keycode = gesture_key_array[6];
 			break; */
 	case ID_GESTURE_WORD_e:
 		if (gesture_mode & MASK_GESTURE_E) {
-			NVT_LOG("Gesture : Word-e.\n");
+			pr_info("Gesture : Word-e.\n");
 			keycode = gesture_key_array[7];
 		}
 		break;
 	case ID_GESTURE_WORD_S:
 		if (gesture_mode & MASK_GESTURE_W) {
-			NVT_LOG("Gesture : Word-S.\n");
+			pr_info("Gesture : Word-S.\n");
 			keycode = gesture_key_array[8];
 		}
 		break;
 	case ID_GESTURE_SLIDE_UP:
 		if (gesture_mode & MASK_GESTURE_SLIDE_UP) {
-			NVT_LOG("Gesture : Slide UP.\n");
+			pr_info("Gesture : Slide UP.\n");
 			keycode = gesture_key_array[9];
 		}
 		break;
 		/* case GESTURE_SLIDE_DOWN:
-			NVT_LOG("Gesture : Slide DOWN.\n");
+			pr_info("Gesture : Slide DOWN.\n");
 			keycode = gesture_key_array[10];
 			break;
 		case GESTURE_SLIDE_LEFT:
-			NVT_LOG("Gesture : Slide LEFT.\n");
+			pr_info("Gesture : Slide LEFT.\n");
 			keycode = gesture_key_array[11];
 			break;
 		case GESTURE_SLIDE_RIGHT:
-			NVT_LOG("Gesture : Slide RIGHT.\n");
+			pr_info("Gesture : Slide RIGHT.\n");
 			keycode = gesture_key_array[12];
 			break; */
 	default:
@@ -1151,7 +1150,7 @@ static void nvt_parse_dt(struct device *dev)
 
 	ts->irq_gpio = of_get_named_gpio_flags(np, "novatek,irq-gpio", 0,
 					       &ts->irq_flags);
-	NVT_LOG("novatek,irq-gpio=%d\n", ts->irq_gpio);
+	pr_info("novatek,irq-gpio=%d\n", ts->irq_gpio);
 }
 #else
 static void nvt_parse_dt(struct device *dev)
@@ -1175,7 +1174,7 @@ static int nvt_gpio_config(struct nvt_ts_data *ts)
 	if (gpio_is_valid(ts->irq_gpio)) {
 		ret = gpio_request_one(ts->irq_gpio, GPIOF_IN, "NVT-int");
 		if (ret) {
-			NVT_ERR("Failed to request NVT-int GPIO\n");
+			pr_err("Failed to request NVT-int GPIO\n");
 			goto err_request_irq_gpio;
 		}
 	}
@@ -1262,7 +1261,7 @@ static void nvt_ts_work_func(struct work_struct *work)
 	ret = CTP_I2C_READ(ts->client, I2C_FW_Address, point_data,
 			   POINT_DATA_LEN + 1);
 	if (ret < 0) {
-		NVT_ERR("CTP_I2C_READ failed.(%d)\n", ret);
+		pr_err("CTP_I2C_READ failed.(%d)\n", ret);
 		goto XFER_ERROR;
 	}
 #if NVT_TOUCH_ESD_PROTECT
@@ -1452,7 +1451,7 @@ static int8_t nvt_ts_check_chip_ver_trim(void)
 		buf[6] = 0x00;
 		CTP_I2C_READ(ts->client, I2C_BLDR_Address, buf, 7);
 
-		NVT_LOG("buf[1]=0x%02X, buf[2]=0x%02X, buf[3]=0x%02X, buf[4]=0x%02X, buf[5]=0x%02X, buf[6]=0x%02X\n",
+		pr_info("buf[1]=0x%02X, buf[2]=0x%02X, buf[3]=0x%02X, buf[4]=0x%02X, buf[5]=0x%02X, buf[6]=0x%02X\n",
 			buf[1], buf[2], buf[3], buf[4], buf[5], buf[6]);
 
 		/* compare read chip id on supported list */
@@ -1474,7 +1473,7 @@ static int8_t nvt_ts_check_chip_ver_trim(void)
 				found_nvt_chip = 1;
 
 			if (found_nvt_chip) {
-				NVT_LOG("This is NVT touch IC\n");
+				pr_info("This is NVT touch IC\n");
 				ts->mmap = trim_id_table[list].mmap;
 				ts->carrier_system =
 					trim_id_table[list].carrier_system;
@@ -1508,11 +1507,11 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 	int32_t retry = 0;
 #endif
 
-	NVT_LOG("start\n");
+	pr_info("start\n");
 
 	ts = kmalloc(sizeof(struct nvt_ts_data), GFP_KERNEL);
 	if (ts == NULL) {
-		NVT_ERR("failed to allocated memory for nvt ts data\n");
+		pr_err("failed to allocated memory for nvt ts data\n");
 		return -ENOMEM;
 	}
 
@@ -1528,7 +1527,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 	ret = nvt_lcm_bias_power_init(ts);
 
 	if (ret) {
-		NVT_ERR("power resource init error!\n");
+		pr_err("power resource init error!\n");
 		goto err_power_resource_init_fail;
 	}
 
@@ -1537,7 +1536,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 
 	/* ---check i2c func.--- */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-		NVT_ERR("i2c_check_functionality failed. (no I2C_FUNC_I2C)\n");
+		pr_err("i2c_check_functionality failed. (no I2C_FUNC_I2C)\n");
 		ret = -ENODEV;
 		goto err_check_functionality_failed;
 	}
@@ -1548,7 +1547,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 	/* ---check chip version trim--- */
 	ret = nvt_ts_check_chip_ver_trim();
 	if (ret) {
-		NVT_ERR("chip is not identified\n");
+		pr_err("chip is not identified\n");
 		ret = -EINVAL;
 		goto err_chipvertrim_failed;
 	}
@@ -1556,7 +1555,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 	/* ---request and config GPIOs--- */
 	ret = nvt_gpio_config(ts);
 	if (ret) {
-		NVT_ERR("gpio config error!\n");
+		pr_err("gpio config error!\n");
 		goto err_gpio_config_failed;
 	}
 
@@ -1571,7 +1570,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 	/* ---create workqueue--- */
 	nvt_wq = create_workqueue("nvt_wq");
 	if (!nvt_wq) {
-		NVT_ERR("nvt_wq create workqueue failed\n");
+		pr_err("nvt_wq create workqueue failed\n");
 		ret = -ENOMEM;
 		goto err_create_nvt_wq_failed;
 	}
@@ -1580,7 +1579,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 	/* ---allocate input device--- */
 	ts->input_dev = input_allocate_device();
 	if (ts->input_dev == NULL) {
-		NVT_ERR("allocate input device failed\n");
+		pr_err("allocate input device failed\n");
 		ret = -ENOMEM;
 		goto err_input_dev_alloc_failed;
 	}
@@ -1649,7 +1648,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 	/* ---register input device--- */
 	ret = input_register_device(ts->input_dev);
 	if (ret) {
-		NVT_ERR("register input device (%s) failed. ret=%d\n",
+		pr_err("register input device (%s) failed. ret=%d\n",
 			ts->input_dev->name, ret);
 		goto err_input_register_device_failed;
 	}
@@ -1657,7 +1656,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 	/* ---set int-pin & request irq--- */
 	client->irq = gpio_to_irq(ts->irq_gpio);
 	if (client->irq) {
-		NVT_LOG("int_trigger_type=%d\n", ts->int_trigger_type);
+		pr_info("int_trigger_type=%d\n", ts->int_trigger_type);
 
 #if WAKEUP_GESTURE
 		ret = request_irq(client->irq, nvt_ts_irq_handler,
@@ -1668,18 +1667,18 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 				  ts->int_trigger_type, client->name, ts);
 #endif
 		if (ret != 0) {
-			NVT_ERR("request irq failed. ret=%d\n", ret);
+			pr_err("request irq failed. ret=%d\n", ret);
 			goto err_int_request_failed;
 		} else {
 			nvt_irq_disable();
-			NVT_LOG("request irq %d succeed\n", client->irq);
+			pr_info("request irq %d succeed\n", client->irq);
 		}
 	}
 
 #if BOOT_UPDATE_FIRMWARE
 	nvt_fwu_wq = create_singlethread_workqueue("nvt_fwu_wq");
 	if (!nvt_fwu_wq) {
-		NVT_ERR("nvt_fwu_wq create workqueue failed\n");
+		pr_err("nvt_fwu_wq create workqueue failed\n");
 		ret = -ENOMEM;
 		goto err_create_nvt_fwu_wq_failed;
 	}
@@ -1706,7 +1705,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 #if NVT_TOUCH_PROC
 	ret = nvt_flash_proc_init();
 	if (ret != 0) {
-		NVT_ERR("nvt flash proc init failed. ret=%d\n", ret);
+		pr_err("nvt flash proc init failed. ret=%d\n", ret);
 		goto err_init_NVT_ts;
 	}
 #endif
@@ -1714,7 +1713,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 #if NVT_TOUCH_EXT_PROC
 	ret = nvt_extra_proc_init();
 	if (ret != 0) {
-		NVT_ERR("nvt extra proc init failed. ret=%d\n", ret);
+		pr_err("nvt extra proc init failed. ret=%d\n", ret);
 		goto err_init_NVT_ts;
 	}
 #endif
@@ -1722,7 +1721,7 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 #if NVT_TOUCH_MP
 	ret = nvt_mp_proc_init();
 	if (ret != 0) {
-		NVT_ERR("nvt mp proc init failed. ret=%d\n", ret);
+		pr_err("nvt mp proc init failed. ret=%d\n", ret);
 		goto err_init_NVT_ts;
 	}
 #endif
@@ -1731,18 +1730,18 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 	nvt_gesture_mode_proc = proc_create(NVT_GESTURE_MODE, 0666, NULL,
 					    &gesture_mode_proc_ops);
 	if (!nvt_gesture_mode_proc)
-		NVT_ERR("create proc tpd_gesture failed\n");
+		pr_err("create proc tpd_gesture failed\n");
 #endif
 
 	ts->fb_notif.notifier_call = fb_notifier_callback;
 	ret = fb_register_client(&ts->fb_notif);
 	if (ret) {
-		NVT_ERR("register fb_notifier failed. ret=%d\n", ret);
+		pr_err("register fb_notifier failed. ret=%d\n", ret);
 		goto err_register_fb_notif_failed;
 	}
 
 	bTouchIsAwake = 1;
-	NVT_LOG("end\n");
+	pr_info("end\n");
 	nvt_irq_enable();
 
 	return 0;
@@ -1783,11 +1782,11 @@ return:
 static int32_t nvt_ts_remove(struct i2c_client *client)
 {
 	if (fb_unregister_client(&ts->fb_notif))
-		NVT_ERR("Error occurred while unregistering fb_notifier.\n");
+		pr_err("Error occurred while unregistering fb_notifier.\n");
 
 	mutex_destroy(&ts->lock);
 
-	NVT_LOG("Removing driver...\n");
+	pr_info("Removing driver...\n");
 
 	free_irq(client->irq, ts);
 	input_unregister_device(ts->input_dev);
@@ -1804,7 +1803,7 @@ long get_gesture_mode(void)
 
 void set_gesture_mode(long enable)
 {
-	NVT_LOG("%s gesture mode\n", (enable == 0) ? "disable" : "enable");
+	pr_info("%s gesture mode\n", (enable == 0) ? "disable" : "enable");
 	gesture_mode = enable;
 	return;
 }
@@ -1825,13 +1824,11 @@ static int32_t nvt_ts_suspend(struct device *dev)
 #endif
 
 	if (!bTouchIsAwake) {
-		NVT_LOG("Touch is already suspend\n");
+		pr_debug("Touch is already suspend\n");
 		return 0;
 	}
 
 	mutex_lock(&ts->lock);
-
-	NVT_LOG("start\n");
 
 	bTouchIsAwake = 0;
 
@@ -1847,7 +1844,6 @@ static int32_t nvt_ts_suspend(struct device *dev)
 		buf[0] = EVENT_MAP_HOST_CMD;
 		buf[1] = 0x11;
 		CTP_I2C_WRITE(ts->client, I2C_FW_Address, buf, 2);
-		NVT_LOG("Enter sleep mode\n");
 	} else {
 		/* ---write i2c command to enter "wakeup gesture mode"--- */
 		buf[0] = EVENT_MAP_HOST_CMD;
@@ -1856,7 +1852,7 @@ static int32_t nvt_ts_suspend(struct device *dev)
 
 		enable_irq_wake(ts->client->irq);
 
-		NVT_LOG("Enter gesture mode\n");
+		pr_info("Enter gesture mode\n");
 	}
 #else /* WAKEUP_GESTURE */
 	nvt_irq_disable();
@@ -1886,14 +1882,10 @@ static int32_t nvt_ts_suspend(struct device *dev)
 
 	mutex_unlock(&ts->lock);
 
-	if (((gesture_mode & 0x100) == 0) || ((gesture_mode & 0x0FF) == 0)) {
+	if (((gesture_mode & 0x100) == 0) || ((gesture_mode & 0x0FF) == 0))
 		nvt_lcm_power_source_ctrl(data, 0); //disable vsp/vsn
-		NVT_LOG("sleep suspend end  disable vsp/vsn\n");
-	} else {
-		NVT_LOG("gesture suspend end not disable vsp/vsn\n");
-	}
-
-	NVT_LOG("end\n");
+	else
+		pr_info("gesture suspend end not disable vsp/vsn\n");
 
 	return 0;
 }
@@ -1912,13 +1904,11 @@ static int32_t nvt_ts_resume(struct device *dev)
 	nvt_lcm_power_source_ctrl(data, 1); /* enable vsp/vsn */
 
 	if (bTouchIsAwake) {
-		NVT_LOG("Touch is already resume\n");
+		pr_debug("Touch is already resume\n");
 		return 0;
 	}
 
 	mutex_lock(&ts->lock);
-
-	NVT_LOG("start\n");
 
 	/* please make sure display reset(RESX) sequence and
 	 * mipi dsi cmds sent before this
@@ -1933,10 +1923,7 @@ static int32_t nvt_ts_resume(struct device *dev)
 #endif
 
 	bTouchIsAwake = 1;
-
 	mutex_unlock(&ts->lock);
-
-	NVT_LOG("end\n");
 
 	return 0;
 }
@@ -2005,7 +1992,7 @@ static int32_t __init nvt_driver_init(void)
 {
 	int32_t ret = 0;
 
-	NVT_LOG("start\n");
+	pr_info("start\n");
 	//---add i2c driver---
 	ret = i2c_add_driver(&nvt_i2c_driver);
 	if (ret) {
@@ -2013,7 +2000,7 @@ static int32_t __init nvt_driver_init(void)
 		goto err_driver;
 	}
 
-	pr_info("%s: finished\n", __func__);
+	pr_info("finished\n");
 
 err_driver:
 	return ret;
