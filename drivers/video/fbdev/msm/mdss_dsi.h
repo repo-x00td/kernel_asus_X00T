@@ -959,7 +959,6 @@ static inline enum dsi_physical_lane_id mdss_dsi_logical_to_physical_lane(
 	return i;
 }
 
-extern int nvt_tp_check;
 extern char mdss_mdp_panel[MDSS_MAX_PANEL_LEN];
 extern void mdss_dsi_panel_cmds_send(struct mdss_dsi_ctrl_pdata *ctrl,
 				      struct dsi_panel_cmds *pcmds, u32 flags);
