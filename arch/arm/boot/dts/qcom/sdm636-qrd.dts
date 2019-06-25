@@ -110,22 +110,6 @@
 		qcom,afe-power-off-delay-us = <6>;
 	};
 
-	common_fp {
-		compatible = "common,fingerprint";
-		interrupt-parent = <&tlmm>;
-		interrupts = <72 0x0>;
-
-		common,gpio_reset   = <&tlmm 20 0>;
-		common,gpio_irq		= <&tlmm 72 0>;
-		common,gpio_vdd		= <&pm660l_gpios 5 0>;
-		pinctrl-names		= "commonfp_reset_reset",
-					  "commonfp_reset_active",
-					  "commonfp_irq_active";
-		pinctrl-0 = <&commonfp_reset_reset>;
-		pinctrl-1 = <&commonfp_reset_active>;
-		pinctrl-2 = <&commonfp_irq_active>;
-	};
-
 	cdfinger_fingerprint {
 		compatible = "cdfinger,fingerprint";
 		interrupt-parent = <&tlmm>;
@@ -133,6 +117,13 @@
 		cdfinger,reset_gpio = <&tlmm 20 0>;
 		cdfinger,gpio_vdd  = <&pm660l_gpios 5 0>;
 		cdfinger,irq_gpio = <&tlmm 72 0>;
+
+		pinctrl-names		= "cdfinger_reset_reset",
+					  "cdfinger_reset_active",
+					  "cdfinger_irq_active";
+		pinctrl-0 = <&cdfinger_reset_reset>;
+		pinctrl-1 = <&cdfinger_reset_active>;
+		pinctrl-2 = <&cdfinger_irq_active>;
 	};
 
 	goodix_fingerprint {

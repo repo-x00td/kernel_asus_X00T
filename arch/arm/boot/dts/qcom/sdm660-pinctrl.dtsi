@@ -1788,7 +1788,7 @@
 				};
 			};
 
-			commonfp_reset_reset: commonfp_reset_reset {
+			cdfinger_reset_reset: cdfinger_reset_reset {
 				mux {
 					pins = "gpio20";
 					function = "gpio";
@@ -1801,7 +1801,7 @@
 				};
 			};
 
-			commonfp_reset_active: commonfp_reset_active {
+			cdfinger_reset_active: cdfinger_reset_active {
 				mux {
 					pins = "gpio20";
 					function = "gpio";
@@ -1814,7 +1814,7 @@
 				};
 			};
 
-			commonfp_irq_active: commonfp_irq_active {
+			cdfinger_irq_active: cdfinger_irq_active {
 				mux {
 					pins = "gpio72";
 					function = "gpio";
